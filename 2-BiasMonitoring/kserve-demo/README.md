@@ -6,6 +6,8 @@ crucial to monitor your models for fairness during real-world deployments:
 
 This demo will explore how to use TrustyAI to monitor models for bias, and how not all model biases are visible at training time.
 
+This demo leverages [KServe](https://github.com/kserve/kserve) for model deployment; for a guide on how to install KServe on Open Data Hub, refer to this [installation guide](https://developers.redhat.com/articles/2024/06/27/how-install-kserve-using-open-data-hub).
+
 ## Context
 We will take on the
 persona of a dev-ops engineer for a credit lender. Our data scientists have created two
@@ -36,9 +38,11 @@ Follow the instructions within the [Installation section](../1-Installation/READ
 you should have an ODH installation, a TrustyAI Operator, and a `model-namespace` project containing
 an instance of the TrustyAI Service.
 
-> ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following command:
+Since models deployed via KServe are currently authenticated by leveraging [Authorino](https://github.com/Kuadrant/authorino), it is necessary to install the Authorino Operator and configure it accordingly; refer to this [blog post](https://developers.redhat.com/articles/2024/07/22/protecting-your-models-made-easy-authorino) on how to set up Authorino on Open Data Hub.
+> ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following commands:
 > ```shell
-> export TOKEN=$(oc whoami -t)
+> oc apply -f resources/trustyai_service_account.yaml
+> export TOKEN=$(oc create token user-one)   
 > ```
 
 ## Deploy Models
@@ -48,10 +52,18 @@ an instance of the TrustyAI Service.
 4) Deploy the first model: `oc apply -f resources/model_alpha.yaml`
 5) Deploy the second model: `oc apply -f resources/model_beta.yaml`
 6) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen.
-   1) You should see four pods: ![Pods in the Model Namespace](images/model_namespace_pods.png)
-   2) Once the TrustyAI Service registers the deployed models, you will see the `
-modelmesh-serving-ovms-1.x-xxxxx` pods get re-deployed.
-   3) Verify that the models are registered with TrustyAI by selecting one of the `modelmesh-serving-ovms-1.x-xxxxx` pods. In the Environment tab, if the field `MM_PAYLOAD_PROCESSORS` is set, then your models are successfully registered with TrustyAI: ![Pods in the Model Namespace](images/model_environment.png)
+
+Alternatively, navigate to the `resources/` directory and run
+```shell
+just create-all
+```
+to deploy all the resources at once. This alternative deployment relies on the [just](https://github.com/casey/just) CLI tool, which needs to be installed on your machine.
+
+To sense-check that the namespace contains the expected resources, navigate to the OpenShift Console and look at the Workloads -> Pods screen. You should see the following [pods](images/model_namespace_pods.png):
+
+- one pod for the model storage container `minio`
+- four pods for each of the deployed models
+- two pods for the TrustyAI Service
 
 ## Send Training Data to Models
 Here, we'll pass all the training data through the models, such as to be able to compute baseline fairness values:
