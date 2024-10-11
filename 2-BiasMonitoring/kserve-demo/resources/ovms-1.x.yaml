@@ -16,7 +16,7 @@ metadata:
 spec:
   containers:
     - name: kserve-container
-      image: quay.io/opendatahub/openvino_model_server:stable-nightly-2024-05-26
+      image: quay.io/opendatahub/openvino_model_server:stable-nightly-2024-08-04
       args:
         - --model_name={{.Name}}
         - --port=8001

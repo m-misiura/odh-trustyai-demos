@@ -12,7 +12,7 @@ MODEL_BETA=demo-loan-nn-onnx-beta
 MODEL_VERSION_BETA=1
 
 ODHPROJECT=opendatahub
-MM_NAMESPACE=test
+MM_NAMESPACE=model-namespace
 
 oc project $MM_NAMESPACE 2>&1 1>/dev/null
 TRUSTY_POD=$(oc get pods -o name | grep trustyai-service)
