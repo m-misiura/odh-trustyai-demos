@@ -1,0 +1,74 @@
+# Justfile
+
+# Set up namespace
+create-namespace PROJECT_NAME:
+    # Ensure the script is executable
+    chmod +x create_namespace.sh
+    # Run the shell script with the project name
+    ./create_namespace.sh "{{PROJECT_NAME}}"
+
+# set up a service account
+create-service-account:
+    oc apply -f service_account.yaml
+
+# set up model storage
+create-model-container:
+    oc apply -f model_storage_container.yaml
+
+# set up serving runtime
+create-serving-runtime:
+    oc apply -f ovms-1.x.yaml
+
+# deploy model alpha
+create-isvc-model-alpha:
+    oc apply -f model_alpha.yaml
+
+# deploy model beta
+create-isvc-model-beta:
+    oc apply -f model_beta.yaml
+
+# deploy TAS
+create-trusty-ai-service:
+    oc apply -f trustyai_crd.yaml
+
+# run all yaml configurations
+create-all:
+    oc apply -f service_account.yaml
+    oc apply -f model_storage_container.yaml
+    oc apply -f ovms-1.x.yaml
+    oc apply -f model_alpha.yaml
+    oc apply -f model_beta.yaml
+    oc apply -f ../../../1-Installation/resources/trustyai_crd.yaml
+
+# delete service account
+delete-service-account:
+    oc delete -f service_account.yaml
+
+# delete model storage
+delete-model-container:
+    oc delete -f model_storage_container.yaml
+
+# delete serving runtime
+delete-serving-runtime:
+    oc delete -f ovms-1.x.yaml
+
+# delete model alpha
+delete-isvc-model-alpha:
+    oc delete -f model_alpha.yaml
+
+# delete model beta
+delete-isvc-model-beta:
+    oc delete -f model_beta.yaml
+
+# delete TAS
+delete-trusty-ai-service:
+    oc delete -f trustyai_crd.yaml
+
+# delete all yaml configurations
+delete-all:
+    oc delete -f service_account.yaml
+    oc delete -f model_storage_container.yaml
+    oc delete -f ovms-1.x.yaml
+    oc delete -f model_alpha.yaml
+    oc delete -f model_beta.yaml
+    oc delete -f trustyai_crd.yaml
