@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: minio
+  name: minio-deployment
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+        maistra.io/expose-route: "true"
+      name: minio
+    spec:
+      containers:
+      - args:
+        - server
+        - /data1
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: THEACCESSKEY
+        - name: MINIO_SECRET_KEY
+          value: THESECRETKEY
+        image: quay.io/trustyai/modelmesh-minio-examples:latest
+        name: minio
