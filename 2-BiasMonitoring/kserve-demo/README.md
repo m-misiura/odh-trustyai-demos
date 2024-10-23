@@ -82,10 +82,13 @@ This will take a few minutes. The script will print out verification messages in
 ## Examining TrustyAI's Model Metadata
 We can also verify that TrustyAI sees the models via the `/info` endpoint:
 1) Find the route to the TrustyAI Service: `TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})`
-2) Query the `/info` endpoint: `curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq ".[0].data"`. This will output a json file ([sample provided here](resources/info_response.json)) containing the following information for each model:
+2) Query the `/info` endpoints for each model:
+   - `curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-alpha"].data.inputSchema'`
+   - `curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-beta"].data.inputSchema'`
+
+This will output a json file ([sample provided here](resources/info_response.json)) containing the following information for each model:
    1) The names, data types, and positions of fields in the input and output
-   2) The observed values that these fields take
-   3) The total number of input-output pairs observed
+   2) The total number of input-output pairs observed
 
 ## Label Data Fields
 As you can see, our models have not provided particularly useful field names for our inputs and outputs (all some form of `customer_data+input-x`). We can apply a set of _name mappings_ to these to apply meaningful names to the fields. This is done via POST'ing the `/info/names` endpoint:
